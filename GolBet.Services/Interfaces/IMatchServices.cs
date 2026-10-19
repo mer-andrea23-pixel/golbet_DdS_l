@@ -15,5 +15,6 @@ public interface IMatchService
     Task CreateAsync(MatchFormDto dto);
     Task UpdateAsync(MatchFormDto dto);
     Task DeactivateAsync(int id);
+    Task<IEnumerable<MatchDto>> GetAllWithTeamsAsync(string? status, string? search);
 }
 

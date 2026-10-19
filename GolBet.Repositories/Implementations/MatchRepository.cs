@@ -33,4 +33,27 @@ public class MatchRepository : GenericRepository<Match>, IMatchRepository
             .Include(m => m.Bets)
             .AsNoTracking()
             .FirstOrDefaultAsync(m => m.Id == id);
+
+    public async Task<IEnumerable<Match>> GetAllWithTeamsAsync(string? status, string? search)
+{
+    IQueryable<Match> query = _context.Matches
+        .Include(m => m.HomeTeam)
+        .Include(m => m.AwayTeam);
+
+    if (!string.IsNullOrEmpty(status))
+    {
+        
+        if (Enum.TryParse<MatchStatus>(status, true, out var parsedStatus))
+        {
+            query = query.Where(m => m.Status == parsedStatus);
+        }
+    }
+
+    if (!string.IsNullOrEmpty(search))
+    {
+        query = query.Where(m => m.HomeTeam.Name.Contains(search) || m.AwayTeam.Name.Contains(search));
+    }
+
+    return await query.ToListAsync();
+}        
 }

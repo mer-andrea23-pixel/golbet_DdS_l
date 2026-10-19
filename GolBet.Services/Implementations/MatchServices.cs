@@ -78,4 +78,26 @@ private static void ValidateBusinessRules(MatchFormDto dto)
         throw new InvalidOperationException(
             "La fecha del partido debe ser futura.");
 }
+
+public async Task<IEnumerable<MatchDto>> GetAllWithTeamsAsync(string? status, string? search)
+{
+    MatchStatus? matchStatus = null;
+    if (!string.IsNullOrEmpty(status) && Enum.TryParse<MatchStatus>(status, true, out var parsedStatus))
+    {
+        matchStatus = parsedStatus;
+    }
+
+    var matches = await _matchRepository.GetAllWithTeamsAsync(matchStatus);
+
+    if (!string.IsNullOrEmpty(search))
+    {
+        matches = matches.Where(m => 
+            (m.HomeTeam != null && m.HomeTeam.Name.Contains(search, StringComparison.OrdinalIgnoreCase)) ||
+            (m.AwayTeam != null && m.AwayTeam.Name.Contains(search, StringComparison.OrdinalIgnoreCase))
+        );
+    }
+
+    return _mapper.Map<IEnumerable<MatchDto>>(matches);
+}
+
 }

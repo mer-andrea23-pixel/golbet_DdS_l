@@ -118,4 +118,14 @@ private async Task LoadTeamsAsync()
  var teams = await _teamService.GetAllAsync();
  ViewBag.Teams = new SelectList(teams, "Id", "Name");
 }
+[HttpGet("Matches/Search")]
+public async Task<IActionResult> Index(string? status, string? search)
+{
+    var matches = await _matchService.GetAllWithTeamsAsync(status, search);
+
+    ViewBag.CurrentStatus = status;
+    ViewBag.CurrentSearch = search;
+
+    return View(matches);
+}
 }
